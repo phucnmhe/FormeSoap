@@ -1,0 +1,10 @@
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.bin
+
+# .NET
+bin/
+obj/
+*.cache

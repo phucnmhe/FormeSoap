@@ -1,0 +1,255 @@
+@{
+    ViewData["Title"] = "API Test Page";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: monospace;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .response-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .response-section.show {
+            display: block;
+        }
+
+        .response-section h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .response-content {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            white-space: pre-wrap;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .success {
+            border-left-color: #4caf50;
+        }
+
+        .error {
+            border-left-color: #f44336;
+        }
+
+        .demo-cred {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .demo-cred p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .demo-cred code {
+            background: #bbdefb;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 API Test Page</h1>
+        <p class="subtitle">Test Backend Authentication API</p>
+
+        <div class="demo-cred">
+            <p><strong>📝 Demo Credentials:</strong></p>
+            <p>👤 Username: <code>admin</code></p>
+            <p>🔑 Password: <code>Admin@123</code></p>
+        </div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">Username or Email</label>
+                <input type="text" id="username" name="username" placeholder="Enter username or email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
+            </div>
+
+            <button type="submit" class="btn" id="submitBtn">
+                🚀 Test Login API
+            </button>
+        </form>
+
+        <div id="responseSection" class="response-section">
+            <h3 id="responseTitle">Response:</h3>
+            <div id="responseContent" class="response-content"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const responseSection = document.getElementById('responseSection');
+        const responseContent = document.getElementById('responseContent');
+        const responseTitle = document.getElementById('responseTitle');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Disable button
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Testing...';
+
+            try {
+                const response = await fetch('http://localhost:5050/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const data = await response.json();
+
+                // Show response
+                responseSection.classList.add('show');
+                responseContent.classList.remove('success', 'error');
+
+                if (response.ok) {
+                    responseTitle.textContent = '✅ Success Response:';
+                    responseContent.classList.add('success');
+                    responseContent.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    responseTitle.textContent = '❌ Error Response:';
+                    responseContent.classList.add('error');
+                    responseContent.textContent = JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                responseSection.classList.add('show');
+                responseTitle.textContent = '❌ Network Error:';
+                responseContent.classList.add('error');
+                responseContent.textContent = `Error: ${error.message}\n\nMake sure backend is running on http://localhost:5050`;
+            } finally {
+                // Re-enable button
+                submitBtn.disabled = false;
+                submitBtn.textContent = '🚀 Test Login API';
+            }
+        });
+    </script>
+</body>
+</html>

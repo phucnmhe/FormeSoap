@@ -1,7 +1,26 @@
+using Microsoft.EntityFrameworkCore;
+using Project_Exe201.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Add CORS for React frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+// Add DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 var app = builder.Build();
 
@@ -13,10 +32,13 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); // Commented out for development with HTTP frontend
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// Use CORS
+app.UseCors("AllowReactApp");
 
 app.UseAuthorization();
 
